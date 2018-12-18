@@ -29,13 +29,6 @@ except (ValueError, IndexError):
 
 
 def main():
-    if MODE == '--live':
-        live_mode()
-    else:
-        print('Please write live-mode with the first argument')
-
-
-def live_mode():
     standard.addstr('Noise-cancelling live')
 
     stream = pythonAudioObject.open(
@@ -74,7 +67,7 @@ def live_mode():
             # On every nth iteration append the difference between the level of the source audio and the inverted one
             if i % IterationsN == 0:
                 standard.clear()
-                difference = calculate_difference(original, inverted)
+                difference = difference(original, inverted)
                 standard.addstr('Difference (in dB): {}'.format(difference))
                 decibel_levels.append(difference)
                 int_original, int_inverted, int_difference = calculate_wave(original, inverted)
@@ -154,18 +147,18 @@ def calculate_decibel(data):
     return db
 
 
-def calculate_difference(data1, data2):
+def difference(data1, data2):
     """
     Calculates the difference level in decibel between the received binary inputs
-    :param data1: The first binary digit
-    :param data2: The second binary digit
-    :return difference: The calculated difference level (in dB)
+    :param data1: Bin digit 1
+    :param data2: Bin digit 2
+    :return difference: Calculated difference level (in dB)
     """
     difference = calculate_decibel(data1) - calculate_decibel(data2)
     return difference
 
 
-def calculate_wave(original, inverted, ratio):
+def wavelength(original, inverted, ratio):
     """
     Converts the bytestrings it receives into plottable integers and calculates the difference between both
     :param original: A bytestring of sound
@@ -180,9 +173,9 @@ def calculate_wave(original, inverted, ratio):
     return originalInt, invertedInt, differenceInt
 
 
-def plot_results(data, nth_iteration):
+def resultsPlot(data, nth_iteration):
     """
-    Plots the list it receives and cuts off the first ten entries to circumvent the plotting of initial silence
+    Plots the list it receives 
     :param data: A list of data to be plotted
     :param nth_iteration: Used for the label of the x axis
     """
@@ -193,20 +186,20 @@ def plot_results(data, nth_iteration):
     plt.show()
 
 
-def plot_wave_results(total_original, total_inverted, total_difference, nth_iteration):
+def wavelengthGraph(originalResult, invertedResult, differenceResult, iterationN):
     """
-    Plots the three waves of the original sound, the inverted one and their difference
-    :param total_original: A list of the original wave data
-    :param total_inverted: A list of the inverted wave data
-    :param total_difference: A list of the difference of 'total_original' and 'total_inverted'
+    Graph the inverted wavelength, the origanal, and the difference between the two
+    :param total_inverted: Inverted wavelength list
+    :param total_original: Original wavelength list
+    :param total_difference: Difference list'
     :param nth_iteration: Used for the label of the x axis
     """
-    plt.plot(total_original, 'b')
-    plt.plot(total_inverted, 'r')
-    plt.plot(total_difference, 'g')
-    plt.xlabel('Time (per {}th {} byte chunk)'.format(nth_iteration, FOLD))
-    plt.ylabel('Amplitude (integer representation of each {} byte chunk)'.format(nth_iteration, FOLD))
-    plt.suptitle('Waves: original (blue), inverted (red), output (green)', fontsize=14)
+    plt.plot(invertedResult, 'r')
+    plt.plot(originalResult, 'b')
+    plt.plot(differenceResult, 'g')
+    plt.xlabel('Time (per {}th {} byte chunk)'.format(iterationN, FOLD))
+    plt.ylabel('Amplitude (integer representation of each {} byte chunk)'.format(iterationN, FOLD))
+    plt.suptitle('Wavelengths: inverted (red), original (blue), difference (green)', fontsize=14)
     plt.show()
 
 
